@@ -1,0 +1,91 @@
+import { formatNumero, formatDelta, deltaClass } from "@/lib/utils";
+import { Users, Headphones, Heart, TrendingUp } from "lucide-react";
+import type { DashboardKPIs } from "@/types";
+
+const CONTADOR_ALMAS_TOTAL = 16384; // actualizar desde BD en producción
+
+interface Props {
+  kpis: DashboardKPIs;
+}
+
+export default function KpiCards({ kpis }: Props) {
+  const { semana_actual: sa, diferencias: d } = kpis;
+
+  const cards = [
+    {
+      label: "Total asistentes",
+      value: sa.total_general,
+      delta: d.total_general,
+      icon: Users,
+      color: "var(--arm-purple)",
+      bg: "var(--arm-purple-light)",
+    },
+    {
+      label: "En auditorio",
+      value: sa.total_auditorio,
+      delta: d.total_auditorio,
+      icon: Headphones,
+      color: "var(--arm-teal)",
+      bg: "var(--arm-teal-light)",
+    },
+    {
+      label: "Aceptaron a Jesús",
+      value: sa.total_paj,
+      delta: d.total_paj,
+      icon: Heart,
+      color: "#D85A30",
+      bg: "#FAECE7",
+    },
+    {
+      label: "Contador de almas",
+      value: CONTADOR_ALMAS_TOTAL,
+      delta: null,
+      icon: TrendingUp,
+      color: "var(--arm-purple)",
+      bg: "var(--arm-purple-light)",
+      accent: true,
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {cards.map((c) => (
+        <div
+          key={c.label}
+          className={`kpi-card ${c.accent ? "ring-1" : ""}`}
+          style={c.accent ? { ringColor: "var(--arm-purple)", ringOpacity: 0.2 } : {}}
+        >
+          <div className="flex items-start justify-between mb-3">
+            <p className="text-xs font-medium text-gray-400 leading-tight">
+              {c.label}
+            </p>
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+              style={{ backgroundColor: c.bg }}
+            >
+              <c.icon size={15} style={{ color: c.color }} />
+            </div>
+          </div>
+
+          <p
+            className="text-2xl font-semibold tracking-tight"
+            style={{ color: c.accent ? c.color : "inherit" }}
+          >
+            {formatNumero(c.value)}
+          </p>
+
+          {c.delta !== null && (
+            <p className={`text-xs mt-1.5 ${deltaClass(c.delta)}`}>
+              {formatDelta(c.delta)}{" "}
+              <span className="text-gray-400 font-normal">vs sem. anterior</span>
+            </p>
+          )}
+
+          {c.accent && (
+            <p className="text-xs mt-1.5 text-gray-400">Acumulado 2026</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}

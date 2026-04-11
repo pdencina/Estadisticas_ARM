@@ -1,0 +1,39 @@
+import { formatNumero } from "@/lib/utils";
+
+export default function ContadorAlmas({ total }: { total: number }) {
+  return (
+    <div
+      className="card p-6 flex flex-col items-center justify-center text-center
+                 relative overflow-hidden"
+      style={{ minHeight: 180 }}
+    >
+      {/* Background decoration */}
+      <div
+        className="absolute inset-0 opacity-5"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 50%, var(--arm-purple) 0%, transparent 70%)",
+        }}
+      />
+
+      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3 z-10">
+        Contador de almas
+      </p>
+      <p
+        className="text-5xl font-bold tracking-tight z-10"
+        style={{ color: "var(--arm-purple)" }}
+      >
+        {formatNumero(total)}
+      </p>
+      <p className="text-xs text-gray-400 mt-3 z-10">
+        Personas que aceptaron a Jesús — acumulado 2026
+      </p>
+
+      {/* Decorative lines */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-1 rounded-b-xl"
+        style={{ backgroundColor: "var(--arm-purple)", opacity: 0.3 }}
+      />
+    </div>
+  );
+}
