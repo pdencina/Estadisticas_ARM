@@ -79,21 +79,13 @@ export interface Encuentro {
   modalidad: Modalidad;
   predicador: string | null;
   nombre_mensaje: string | null;
-
-  // Totales rápidos
   total_general: number;
   acepto_jesus_presencial: number;
-
-  // Detalle JSON
   asistencia: AsistenciaDetalle;
   voluntarios: VoluntariosDetalle;
   online: OnlineDetalle;
-
-  // Liderazgo
   lideres_voluntarios: string | null;
   admins_campus: string | null;
-
-  // Metadata
   reportado_por: string | null;
   estado: "borrador" | "enviado" | "validado";
   created_at: string;
@@ -128,7 +120,7 @@ export interface CampusSemanaData {
 }
 
 // ─── Tipos para formularios ───────────────────────────────────────────────────
-export type NuevoEncuentroForm = Omit<
+export type NuevoEncuentroForm = Omit
   Encuentro,
   "id" | "campus" | "reportado_por" | "estado" | "created_at" | "updated_at"
 >;
@@ -145,7 +137,6 @@ export interface DashboardKPIs {
     total_general: number;
     total_auditorio: number;
     total_paj: number;
-    contador_almas: number;
   };
   semana_anterior: {
     total_general: number;
