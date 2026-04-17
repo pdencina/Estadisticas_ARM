@@ -2,7 +2,7 @@ import { formatNumero, formatDelta, deltaClass } from "@/lib/utils";
 import { Users, Headphones, Heart, TrendingUp } from "lucide-react";
 import type { DashboardKPIs } from "@/types";
 
-const CONTADOR_ALMAS_TOTAL = 16384; // actualizar desde BD en producción
+const CONTADOR_ALMAS_TOTAL = 16384;
 
 interface Props {
   kpis: DashboardKPIs;
@@ -19,6 +19,7 @@ export default function KpiCards({ kpis }: Props) {
       icon: Users,
       color: "var(--arm-purple)",
       bg: "var(--arm-purple-light)",
+      accent: false,
     },
     {
       label: "En auditorio",
@@ -27,6 +28,7 @@ export default function KpiCards({ kpis }: Props) {
       icon: Headphones,
       color: "var(--arm-teal)",
       bg: "var(--arm-teal-light)",
+      accent: false,
     },
     {
       label: "Aceptaron a Jesús",
@@ -35,6 +37,7 @@ export default function KpiCards({ kpis }: Props) {
       icon: Heart,
       color: "#D85A30",
       bg: "#FAECE7",
+      accent: false,
     },
     {
       label: "Contador de almas",
@@ -52,8 +55,7 @@ export default function KpiCards({ kpis }: Props) {
       {cards.map((c) => (
         <div
           key={c.label}
-          className={`kpi-card ${c.accent ? "ring-1" : ""}`}
-          style={c.accent ? { ringColor: "var(--arm-purple)", ringOpacity: 0.2 } : {}}
+          className={`kpi-card ${c.accent ? "ring-1 ring-purple-200" : ""}`}
         >
           <div className="flex items-start justify-between mb-3">
             <p className="text-xs font-medium text-gray-400 leading-tight">
