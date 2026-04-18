@@ -8,10 +8,20 @@ interface Props {
   kpis: DashboardKPIs;
 }
 
+interface CardConfig {
+  label: string;
+  value: number;
+  delta: number | null;
+  icon: React.ElementType;
+  color: string;
+  bg: string;
+  accent: boolean;
+}
+
 export default function KpiCards({ kpis }: Props) {
   const { semana_actual: sa, diferencias: d } = kpis;
 
-  const cards = [
+  const cards: CardConfig[] = [
     {
       label: "Total asistentes",
       value: sa.total_general,
@@ -58,9 +68,7 @@ export default function KpiCards({ kpis }: Props) {
           className={`kpi-card ${c.accent ? "ring-1 ring-purple-200" : ""}`}
         >
           <div className="flex items-start justify-between mb-3">
-            <p className="text-xs font-medium text-gray-400 leading-tight">
-              {c.label}
-            </p>
+            <p className="text-xs font-medium text-gray-400 leading-tight">{c.label}</p>
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
               style={{ backgroundColor: c.bg }}

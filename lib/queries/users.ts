@@ -9,21 +9,21 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
 
   const { data, error } = await supabase
     .from("user_profiles")
-    .select(`*, campus:campus_id(id, nombre, ciudad, pais)`)
+    .select("*, campus:campus_id(id, nombre, ciudad, pais)")
     .eq("id", user.id)
     .single();
 
   if (error) return null;
-  return data as UserProfile;
+  return data as unknown as UserProfile;
 }
 
-export async function getAllUsers() {
+export async function getAllUsers(): Promise<UserProfile[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("user_profiles")
-    .select(`*, campus:campus_id(id, nombre, ciudad, pais)`)
+    .select("*, campus:campus_id(id, nombre, ciudad, pais)")
     .order("nombre");
 
   if (error) throw new Error(error.message);
-  return data as UserProfile[];
+  return (data ?? []) as unknown as UserProfile[];
 }

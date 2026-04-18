@@ -1,12 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Encuentro, UserProfile } from "@/types";
+import type { Encuentro } from "@/types";
 
 export async function getEncuentros(campusId?: string) {
   const supabase = await createClient();
 
   let query = supabase
     .from("encuentros")
-    .select(`*, campus:campus_id(id, nombre, ciudad, pais)`)
+    .select("*, campus:campus_id(id, nombre, ciudad, pais)")
     .order("fecha", { ascending: false })
     .order("horario", { ascending: true });
 
@@ -16,37 +16,36 @@ export async function getEncuentros(campusId?: string) {
 
   const { data, error } = await query;
   if (error) throw new Error(error.message);
-  return data as Encuentro[];
+  return (data ?? []) as unknown as Encuentro[];
 }
 
 export async function getEncuentroById(id: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("encuentros")
-    .select(`*, campus:campus_id(id, nombre, ciudad, pais)`)
+    .select("*, campus:campus_id(id, nombre, ciudad, pais)")
     .eq("id", id)
     .single();
 
   if (error) throw new Error(error.message);
-  return data as Encuentro;
+  return data as unknown as Encuentro;
 }
 
 export async function getEncuentrosPendientes() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("encuentros")
-    .select(`*, campus:campus_id(id, nombre, ciudad, pais)`)
+    .select("*, campus:campus_id(id, nombre, ciudad, pais)")
     .eq("estado", "borrador")
     .order("fecha", { ascending: false });
 
   if (error) throw new Error(error.message);
-  return data as Encuentro[];
+  return (data ?? []) as unknown as Encuentro[];
 }
 
 export async function getEncuentrosSemanaActual() {
   const supabase = await createClient();
 
-  // Lunes de esta semana
   const ahora = new Date();
   const diaSemana = ahora.getDay() || 7;
   const lunes = new Date(ahora);
@@ -54,15 +53,17 @@ export async function getEncuentrosSemanaActual() {
   const domingo = new Date(lunes);
   domingo.setDate(lunes.getDate() + 6);
 
+  const fmt = (d: Date) => d.toISOString().split("T")[0];
+
   const { data, error } = await supabase
     .from("encuentros")
-    .select(`*, campus:campus_id(id, nombre, ciudad, pais)`)
-    .gte("fecha", lunes.toISOString().split("T")[0])
-    .lte("fecha", domingo.toISOString().split("T")[0])
+    .select("*, campus:campus_id(id, nombre, ciudad, pais)")
+    .gte("fecha", fmt(lunes))
+    .lte("fecha", fmt(domingo))
     .order("fecha", { ascending: true });
 
   if (error) throw new Error(error.message);
-  return data as Encuentro[];
+  return (data ?? []) as unknown as Encuentro[];
 }
 
 export async function getDashboardKPIs(campusId?: string) {
@@ -71,13 +72,11 @@ export async function getDashboardKPIs(campusId?: string) {
   const ahora = new Date();
   const diaSemana = ahora.getDay() || 7;
 
-  // Semana actual (lun-dom)
   const lunesActual = new Date(ahora);
   lunesActual.setDate(ahora.getDate() - diaSemana + 1);
   const domingoActual = new Date(lunesActual);
   domingoActual.setDate(lunesActual.getDate() + 6);
 
-  // Semana anterior
   const lunesAnterior = new Date(lunesActual);
   lunesAnterior.setDate(lunesActual.getDate() - 7);
   const domingoAnterior = new Date(lunesAnterior);
@@ -100,7 +99,7 @@ export async function getDashboardKPIs(campusId?: string) {
     .eq("estado", "enviado");
 
   if (campusId) {
-    queryActual = queryActual.eq("campus_id", campusId);
+    queryActual  = queryActual.eq("campus_id", campusId);
     queryAnterior = queryAnterior.eq("campus_id", campusId);
   }
 
@@ -109,25 +108,24 @@ export async function getDashboardKPIs(campusId?: string) {
     queryAnterior,
   ]);
 
-  const sumar = (arr: typeof actual) => ({
-    total_general: arr?.reduce((s, e) => s + (e.total_general || 0), 0) ?? 0,
+  type Row = { total_general: number; asistencia: { auditorio?: number } | null; acepto_jesus_presencial: number; online: { acepto_jesus?: number } | null };
+
+  const sumar = (arr: Row[] | null) => ({
+    total_general:   arr?.reduce((s, e) => s + (e.total_general || 0), 0) ?? 0,
     total_auditorio: arr?.reduce((s, e) => s + (e.asistencia?.auditorio || 0), 0) ?? 0,
-    total_paj: arr?.reduce(
-      (s, e) => s + (e.acepto_jesus_presencial || 0) + (e.online?.acepto_jesus || 0),
-      0
-    ) ?? 0,
+    total_paj:       arr?.reduce((s, e) => s + (e.acepto_jesus_presencial || 0) + (e.online?.acepto_jesus || 0), 0) ?? 0,
   });
 
-  const sa = sumar(actual);
-  const san = sumar(anterior);
+  const sa  = sumar(actual as Row[] | null);
+  const san = sumar(anterior as Row[] | null);
 
   return {
-    semana_actual: sa,
+    semana_actual:   sa,
     semana_anterior: san,
     diferencias: {
-      total_general: sa.total_general - san.total_general,
+      total_general:   sa.total_general   - san.total_general,
       total_auditorio: sa.total_auditorio - san.total_auditorio,
-      total_paj: sa.total_paj - san.total_paj,
+      total_paj:       sa.total_paj       - san.total_paj,
     },
   };
 }

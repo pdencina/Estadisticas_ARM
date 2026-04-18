@@ -10,7 +10,7 @@ export async function getCampus() {
     .order("nombre");
 
   if (error) throw new Error(error.message);
-  return data as Campus[];
+  return (data ?? []) as Campus[];
 }
 
 export async function getCampusById(id: string) {
@@ -25,7 +25,13 @@ export async function getCampusById(id: string) {
   return data as Campus;
 }
 
-export async function getCampusConEstadisticas() {
+type CampusConStats = Campus & {
+  semana_actual:  { total: number; aud: number; paj: number };
+  semana_anterior:{ total: number; aud: number; paj: number };
+  diferencias:    { total: number; aud: number; paj: number };
+};
+
+export async function getCampusConEstadisticas(): Promise<CampusConStats[]> {
   const supabase = await createClient();
 
   const ahora = new Date();
@@ -60,33 +66,40 @@ export async function getCampusConEstadisticas() {
         .eq("estado", "enviado"),
     ]);
 
-  const agrupar = (arr: typeof actual) => {
+  type Row = {
+    campus_id: string;
+    total_general: number;
+    asistencia: { auditorio?: number } | null;
+    acepto_jesus_presencial: number;
+    online: { acepto_jesus?: number } | null;
+  };
+
+  const agrupar = (arr: Row[] | null) => {
     const map: Record<string, { total: number; aud: number; paj: number }> = {};
     arr?.forEach((e) => {
       if (!map[e.campus_id]) map[e.campus_id] = { total: 0, aud: 0, paj: 0 };
       map[e.campus_id].total += e.total_general || 0;
-      map[e.campus_id].aud += e.asistencia?.auditorio || 0;
-      map[e.campus_id].paj +=
-        (e.acepto_jesus_presencial || 0) + (e.online?.acepto_jesus || 0);
+      map[e.campus_id].aud  += e.asistencia?.auditorio || 0;
+      map[e.campus_id].paj  += (e.acepto_jesus_presencial || 0) + (e.online?.acepto_jesus || 0);
     });
     return map;
   };
 
-  const mapActual = agrupar(actual);
-  const mapAnterior = agrupar(anterior);
+  const mapActual   = agrupar(actual as Row[] | null);
+  const mapAnterior = agrupar(anterior as Row[] | null);
 
-  return campusList?.map((c) => {
-    const a = mapActual[c.id] || { total: 0, aud: 0, paj: 0 };
-    const an = mapAnterior[c.id] || { total: 0, aud: 0, paj: 0 };
+  return (campusList ?? []).map((c) => {
+    const a  = mapActual[c.id]   ?? { total: 0, aud: 0, paj: 0 };
+    const an = mapAnterior[c.id] ?? { total: 0, aud: 0, paj: 0 };
     return {
-      ...c,
-      semana_actual: a,
+      ...(c as Campus),
+      semana_actual:   a,
       semana_anterior: an,
       diferencias: {
         total: a.total - an.total,
-        aud: a.aud - an.aud,
-        paj: a.paj - an.paj,
+        aud:   a.aud   - an.aud,
+        paj:   a.paj   - an.paj,
       },
     };
-  }) ?? [];
+  });
 }

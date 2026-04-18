@@ -15,7 +15,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/usuarios":      "Usuarios y roles",
 };
 
-export default function Topbar({ user: _ }: { user: UserProfile }) {
+export default function Topbar({ user: _user }: { user: UserProfile }) {
   const pathname = usePathname();
 
   const title = Object.entries(PAGE_TITLES).find(([key]) =>
@@ -31,10 +31,7 @@ export default function Topbar({ user: _ }: { user: UserProfile }) {
 
       <span
         className="hidden sm:inline-flex text-xs font-medium px-3 py-1 rounded-full"
-        style={{
-          backgroundColor: "var(--arm-teal-light)",
-          color: "var(--arm-teal)",
-        }}
+        style={{ backgroundColor: "var(--arm-teal-light)", color: "var(--arm-teal)" }}
       >
         {semana}
       </span>

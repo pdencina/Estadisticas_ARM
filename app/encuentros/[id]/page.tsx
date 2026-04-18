@@ -11,10 +11,10 @@ interface Props {
 }
 
 const ESTADO_CONFIG = {
-  borrador: { badge: "badge-amber", icon: Clock,        label: "Borrador"  },
-  enviado:  { badge: "badge-green", icon: CheckCircle,  label: "Enviado"   },
-  validado: { badge: "badge-teal",  icon: Shield,       label: "Validado"  },
-};
+  borrador: { badge: "badge-amber", icon: Clock,       label: "Borrador" },
+  enviado:  { badge: "badge-green", icon: CheckCircle, label: "Enviado"  },
+  validado: { badge: "badge-teal",  icon: Shield,      label: "Validado" },
+} as const;
 
 export default async function EncuentroDetailPage({ params }: Props) {
   const { id } = await params;
@@ -25,7 +25,6 @@ export default async function EncuentroDetailPage({ params }: Props) {
 
   if (!encuentro) notFound();
 
-  // RLS check extra en UI
   if (
     user?.rol !== "admin_global" &&
     encuentro.campus_id !== user?.campus_id
@@ -48,7 +47,6 @@ export default async function EncuentroDetailPage({ params }: Props) {
 
   return (
     <div className="page-content max-w-3xl space-y-5">
-      {/* Back + header */}
       <div>
         <Link href="/encuentros" className="btn-ghost text-xs mb-3 inline-flex">
           <ArrowLeft size={13} /> Volver a encuentros
@@ -79,19 +77,17 @@ export default async function EncuentroDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Info general */}
       <div className="card p-5">
         <h3 className="mb-4">Información del encuentro</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 gap-x-6 text-sm">
-          <Field label="Modalidad"  value={MODALIDAD_LABELS[encuentro.modalidad]} />
-          <Field label="Predicador" value={encuentro.predicador ?? "—"} />
-          <Field label="Mensaje"    value={encuentro.nombre_mensaje ?? "—"} />
-          <Field label="Líderes vol." value={encuentro.lideres_voluntarios ?? "—"} />
+          <Field label="Modalidad"     value={MODALIDAD_LABELS[encuentro.modalidad]} />
+          <Field label="Predicador"    value={encuentro.predicador ?? "—"} />
+          <Field label="Mensaje"       value={encuentro.nombre_mensaje ?? "—"} />
+          <Field label="Líderes vol."  value={encuentro.lideres_voluntarios ?? "—"} />
           <Field label="Admins campus" value={encuentro.admins_campus ?? "—"} />
         </div>
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-3 gap-4">
         <div className="kpi-card text-center">
           <p className="text-xs text-gray-400 mb-1">Total general</p>
@@ -109,7 +105,6 @@ export default async function EncuentroDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Asistencia detalle */}
       <div className="card p-5">
         <h3 className="mb-4">Desglose de asistencia</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -119,7 +114,6 @@ export default async function EncuentroDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Voluntarios */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-4">
           <h3>Voluntarios</h3>
@@ -132,11 +126,10 @@ export default async function EncuentroDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Online */}
       <div className="card p-5">
         <h3 className="mb-4">Online</h3>
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Aceptaron a Jesús" value={String(encuentro.online?.acepto_jesus ?? 0)} />
+          <Field label="Aceptaron a Jesús"      value={String(encuentro.online?.acepto_jesus ?? 0)} />
           <Field label="Espectadores simultáneos" value={String(encuentro.online?.espectadores_max ?? 0)} />
         </div>
       </div>
