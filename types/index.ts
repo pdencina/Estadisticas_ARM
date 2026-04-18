@@ -1,7 +1,5 @@
-// ─── Roles de usuario ────────────────────────────────────────────────────────
 export type UserRole = "admin_global" | "admin_campus" | "voluntario";
 
-// ─── Campus ──────────────────────────────────────────────────────────────────
 export interface Campus {
   id: string;
   nombre: string;
@@ -12,7 +10,6 @@ export interface Campus {
   created_at: string;
 }
 
-// ─── Perfil de usuario ────────────────────────────────────────────────────────
 export interface UserProfile {
   id: string;
   email: string;
@@ -24,15 +21,9 @@ export interface UserProfile {
   created_at: string;
 }
 
-// ─── Encuentro ────────────────────────────────────────────────────────────────
 export type TipoEncuentro =
-  | "domingo"
-  | "miercoles"
-  | "jueves"
-  | "sabado"
-  | "prayer_room"
-  | "encuentro_global"
-  | "otro";
+  | "domingo" | "miercoles" | "jueves" | "sabado"
+  | "prayer_room" | "encuentro_global" | "otro";
 
 export type Modalidad = "presencial" | "online" | "hibrido";
 
@@ -79,28 +70,19 @@ export interface Encuentro {
   modalidad: Modalidad;
   predicador: string | null;
   nombre_mensaje: string | null;
-
-  // Totales rápidos
   total_general: number;
   acepto_jesus_presencial: number;
-
-  // Detalle JSON
   asistencia: AsistenciaDetalle;
   voluntarios: VoluntariosDetalle;
   online: OnlineDetalle;
-
-  // Liderazgo
   lideres_voluntarios: string | null;
   admins_campus: string | null;
-
-  // Metadata
   reportado_por: string | null;
   estado: "borrador" | "enviado" | "validado";
   created_at: string;
   updated_at: string;
 }
 
-// ─── Informe semanal ──────────────────────────────────────────────────────────
 export interface InformeSemanal {
   id: string;
   semana_inicio: string;
@@ -127,25 +109,21 @@ export interface CampusSemanaData {
   diferencia_paj: number;
 }
 
-// ─── Tipos para formularios ───────────────────────────────────────────────────
-export type NuevoEncuentroForm = Omit<
+export type NuevoEncuentroForm = Omit
   Encuentro,
   "id" | "campus" | "reportado_por" | "estado" | "created_at" | "updated_at"
 >;
 
-// ─── Respuestas API ───────────────────────────────────────────────────────────
 export interface ApiResponse<T> {
   data: T | null;
   error: string | null;
 }
 
-// ─── Dashboard KPIs ───────────────────────────────────────────────────────────
 export interface DashboardKPIs {
   semana_actual: {
     total_general: number;
     total_auditorio: number;
     total_paj: number;
-    contador_almas: number;
   };
   semana_anterior: {
     total_general: number;
